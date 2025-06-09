@@ -50,19 +50,16 @@ def run_inference(image_paths: list, image_refs: list):
                         "imageRef": image_ref
                     })
                     # Draw boxes for watermarks
-                    draw = ImageDraw.Draw(image)
-                    for box in result.boxes:
-                        coordinates = box.xyxy.tolist()
-                        draw.rectangle(coordinates[0], outline="red", width=3)
+                    result[0].save(output_path)
                 else:
                     watermark_status.append({
                         "image": output_path,
                         "status": False,
                         "imageRef": image_ref
                     })
+                    image.save(output_path)
                 
                 # Save the image
-                image.save(output_path)
                 print(f"Successfully processed image {image_ref}")
 
             except Exception as e:
