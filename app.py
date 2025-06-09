@@ -14,6 +14,20 @@ from utils import clear_all_data, setup_directories
 # Apply nest_asyncio to allow nested event loops
 nest_asyncio.apply()
 
+def clear_display():
+    """Clear all display elements"""
+    # Clear the detailed results section
+    if 'detailed_results' in st.session_state:
+        st.session_state.detailed_results.empty()
+    
+    # Clear the processed images section
+    if 'processed_images' in st.session_state:
+        st.session_state.processed_images.empty()
+    
+    # Clear the total processed images metric
+    if 'total_processed' in st.session_state:
+        st.session_state.total_processed.empty()
+
 # Initialize session state
 if 'initialized' not in st.session_state:
     clear_all_data()
@@ -38,6 +52,7 @@ with st.sidebar:
     # Add clear results button
     if st.button("Clear Results", type="secondary"):
         clear_all_data()
+        clear_display()
         st.session_state.initialized = True
         st.success("All data cleared!")
         st.rerun()
@@ -71,6 +86,7 @@ def run_pipeline():
 
         # Clear previous results before starting new pipeline
         clear_all_data()
+        clear_display()
         status_placeholder = st.empty()
 
         status_placeholder.info("Initializing pipeline...")
@@ -110,10 +126,10 @@ if st.button("Run Pipeline", type="primary"):
 if os.path.exists("result.json"):
     with open("result.json", "r") as f:
         results = json.load(f)
-        st.sidebar.metric("Total Processed Images", len(results))
+        st.session_state.total_processed = st.sidebar.metric("Total Processed Images", len(results))
 
         # Display detailed results table first
-        st.header("Detailed Results")
+        st.session_state.detailed_results = st.header("Detailed Results")
         
         # Load node mappings
         if os.path.exists("node_mappings.json"):
@@ -155,7 +171,7 @@ if os.path.exists("result.json"):
                         st.markdown(row["Node Links"])
 
         # Display images in a grid
-        st.header("Processed Images")
+        st.session_state.processed_images = st.header("Processed Images")
 
         # Create columns for the grid
         cols = st.columns(3)  # 3 images per row
